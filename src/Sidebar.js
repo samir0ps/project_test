@@ -1,45 +1,41 @@
 import React from "react";
-import { FaTimes } from "react-icons/fa";
+import { FaHome, FaUser, FaCog, FaSignOutAlt,FaTimes } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
-function Sidebar(props) {
+function Sidebar({ onClose }) {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // Perform logout logic here...
+    navigate("/login");
+  };
+
   return (
-    <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-20">
-      <div className="fixed top-0 left-0 w-64 h-full bg-white shadow-lg p-4 overflow-y-auto">
-        <button
-          onClick={props.onClose}
-          className="text-gray-800 mr-4 hover:text-gray-600 transition-colors duration-300 ease-in-out"
+    <div className="fixed top-0 right-0 h-screen w-64 bg-white shadow-lg z-20">
+      <button onClick={onClose}>
+        <FaTimes />
+      </button>
+      <ul className="py-4">
+        <li className="flex items-center py-2 px-4 hover:bg-gray-100 transition-colors duration-300 ease-in-out">
+          <FaHome className="mr-2" />
+          <span>Home</span>
+        </li>
+        <li className="flex items-center py-2 px-4 hover:bg-gray-100 transition-colors duration-300 ease-in-out">
+          <FaUser className="mr-2" />
+          <span>Profile</span>
+        </li>
+        <li className="flex items-center py-2 px-4 hover:bg-gray-100 transition-colors duration-300 ease-in-out">
+          <FaCog className="mr-2" />
+          <span>Settings</span>
+        </li>
+        <li
+          onClick={handleLogout}
+          className="flex items-center py-2 px-4 hover:bg-gray-100 transition-colors duration-300 ease-in-out cursor-pointer"
         >
-          <FaTimes className="w-6 h-6" />
-        </button>
-        <h2 className="text-xl font-bold text-gray-800 mb-4">Categories</h2>
-        <ul className="space-y-2">
-          <li>
-            <a href="#" className="text-gray-800 hover:text-blue-500 transition-colors duration-300 ease-in-out">
-              Electronics
-            </a>
-          </li>
-          <li>
-            <a href="#" className="text-gray-800 hover:text-blue-500 transition-colors duration-300 ease-in-out">
-              Fashion
-            </a>
-          </li>
-          <li>
-            <a href="#" className="text-gray-800 hover:text-blue-500 transition-colors duration-300 ease-in-out">
-              Home & Garden
-            </a>
-          </li>
-          <li>
-            <a href="#" className="text-gray-800 hover:text-blue-500 transition-colors duration-300 ease-in-out">
-              Sports & Outdoors
-            </a>
-          </li>
-          <li>
-            <a href="#" className="text-gray-800 hover:text-blue-500 transition-colors duration-300 ease-in-out">
-              Books & Music
-            </a>
-          </li>
-        </ul>
-      </div>
+          <FaSignOutAlt className="mr-2" />
+          <span>Logout</span>
+        </li>
+      </ul>
     </div>
   );
 }
