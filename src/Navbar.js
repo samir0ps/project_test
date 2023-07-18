@@ -1,113 +1,211 @@
-import React, { useState, useMemo, useEffect } from "react";
-import { FaSearch, FaShoppingCart, FaBars, FaTimes } from "react-icons/fa";
-import AuthModal from "./AuthModal";
-import { useNavigate, useLocation, Link } from "react-router-dom";
-import Fuse from "fuse.js";
-import { products } from "./App";
-import Sidebar from "./Sidebar";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { FaBars, FaTimes, FaSearch, FaShoppingCart } from "react-icons/fa";
 
-function Navbar({ toggleCart, cartCount }) {
-  const [showModal, setShowModal] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const navigate = useNavigate();
-  const location = useLocation();
+function Navbar() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
-  const handleOpenModal = () => setShowModal(true);
-  const handleCloseModal = () => setShowModal(false);
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+    setIsSearchOpen(false);
+    setIsCartOpen(false);
+  };
 
-  const handleToggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+  const toggleSearch = () => {
+    setIsSearchOpen(!isSearchOpen);
+    setIsMenuOpen(false);
+    setIsCartOpen(false);
+  };
 
-  const fuse = useMemo(() => {
-    if (products) {
-      return new Fuse(products, {
-        keys: ["title", "description"],
-        threshold: 0.3,
-      });
-    }
-    return null;
-  }, [products]);
-
-  useEffect(() => {
-    if (searchTerm && fuse) {
-      setSearchResults(fuse.search(searchTerm));
-    } else {
-      setSearchResults([]);
-    }
-  }, [searchTerm, fuse]);
-
-  const handleSearchChange = (e) => setSearchTerm(e.target.value);
-
-  const handleSearchClick = (id) => {
-    navigate(`/products/${id}`);
-    setSearchTerm("");
-    setSearchResults([]);
+  const toggleCart = () => {
+    setIsCartOpen(!isCartOpen);
+    setIsMenuOpen(false);
+    setIsSearchOpen(false);
   };
 
   return (
-    <nav className="bg-white shadow-lg fixed w-full top-0 z-10">
-      <div className="container mx-auto flex items-center justify-between px-4 py-2">
-        <Link to="/" className="flex flex-row">
-          <img
-            src="https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg"
-            alt="logo"
-            className="w-8 h-8 mr-2"
-          />
-          <h1 className="text-xl font-semibold text-gray-800">E-Shop</h1>
-        </Link>
-        <button onClick={handleToggleSidebar}>
-          {isSidebarOpen ? <FaTimes /> : <FaBars />}
-        </button>
-        {location.pathname === "/" && (
-          <div className="flex items-center">
-            <div className="relative mr-4">
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={handleSearchChange}
-                placeholder="Search products..."
-                className="bg-gray-200 text-gray-800 px-4 py-2 rounded-l-lg focus:outline-none focus:ring focus:border-blue-300"
+    <nav className="bg-white shadow-lg">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <div className="flex-shrink-0">
+            <Link to="/" className="flex items-center">
+              <img
+                className="block h-8 w-auto"
+                src="https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg"
+                alt="Workflow"
               />
-              <button
-                className="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600 transition-colors duration-300 ease-in-out"
-              >
-                <FaSearch className="inline-block mr-2 -mt-1" />
-                Search
-              </button>
-              {searchResults.length > 0 && (
-                <ul className="absolute left-0 right-0 bg-white shadow-md border border-gray-200 mt-2 rounded-lg max-h-64 overflow-y-auto z-20">
-                  {searchResults.map((result) => (
-                    <li
-                      key={result?.item?.id}
-                      onClick={() => handleSearchClick(result?.item?.id)}
-                      className="cursor-pointer px-4 py-2 hover:bg-gray-100 transition-colors duration-300 ease-in-out"
-                    >
-                      {result?.item?.title}
-                    </li>
-                  ))}
-                </ul>
-              )}
+              <span className="ml-2 text-xl font-bold text-gray-800">
+                E-commerce
+              </span>
+            </Link>
+          </div>
+
+          {/* Search */}
+          <div className="flex-1 flex justify-center px-2 lg:ml-6 lg:justify-end">
+            <div className="max-w-lg w-full lg:max-w-xs relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaSearch className="text-gray-400" />
+              </div>
+              <input
+                className={`block w-full bg-white border border-gray-400 rounded-md py-2 pl-10 pr-3 text-sm placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
+                  isSearchOpen ? "focus:border-blue-500" : ""
+                }`}
+                type="text"
+                placeholder="Search"
+              />
+              <div className="absolute inset-y-0 right-0 flex items-center">
+                {isSearchOpen ? (
+                  <button
+                    type="button"
+                    onClick={toggleSearch}
+                    className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+                  >
+                    <FaTimes className="h-5 w-5" />
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={toggleSearch}
+                    className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+                  >
+                    <FaSearch className="h-5 w-5" />
+                  </button>
+                )}
+              </div>
             </div>
+          </div>
+
+          {/* Menu */}
+          <div className="-mr-2 flex items-center lg:hidden">
             <button
-              onClick={handleOpenModal}
-              className="bg-gray-200 text-gray-800 px-4 py-2 rounded mr-4 hover:bg-gray-300 transition-colors duration-300 ease-in-out"
+              type="button"
+              onClick={toggleMenu}
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
             >
-              Login / Signup
-            </button>
-            <button
-              onClick={toggleCart}
-              className="bg-blue-500 text-white px-4 py-2 rounded flex items-center hover:bg-blue-600 transition-colors duration-300 ease-in-out"
-            >
-              <FaShoppingCart className="mr-1" />
-              Cart ({cartCount})
+              {isMenuOpen ? (
+                <FaTimes className="h-6 w-6" />
+              ) : (
+                <FaBars className="h-6 w-6" />
+              )}
             </button>
           </div>
-        )}
+
+          {/* Links */}
+          <div className="hidden lg:flex lg:items-center">
+            <Link
+              to="/"
+              className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+            >
+              Home
+            </Link>
+            <Link
+              to="/shop"
+              className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+            >
+              Shop
+            </Link>
+            <button
+              type="button"
+              onClick={toggleCart}
+              className="relative z-10 inline-flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              <FaShoppingCart className="mr-2 h-5 w-5" />
+              <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">
+                3 {/* Replace with actual number of items in cart */}
+              </span>
+            </button>
+          </div>
+        </div>
       </div>
-      {showModal && <AuthModal onClose={handleCloseModal} />}
-      {isSidebarOpen && <Sidebar onClose={handleToggleSidebar} />}
+
+      {/* Mobile menu */}
+      {isMenuOpen && (
+        <div className="lg:hidden">
+          <div className="px-2 pt-2 pb-3 space-y-1">
+            <Link
+              to="/"
+              className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+            >
+              Home
+            </Link>
+            <Link
+              to="/shop"
+              className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+            >
+              Shop
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {/* Cart list */}
+      {isCartOpen && (
+        <div className="absolute top-16 right-0 bg-white shadow-lg px-4 py-3">
+          {/* Replace with actual cart items */}
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-lg font-medium text-gray-800">Shopping Cart</h3>
+            <button
+              type="button"
+              onClick={toggleCart}
+              className="text-gray-600 hover:text-gray-800 focus:outline-none focus:text-gray-800"
+            >
+              <FaTimes className="h-6 w-6" />
+            </button>
+          </div>
+          <div className="flex flex-col space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <h4 className="text-base font-medium text-gray-800">
+                  Product 1
+                </h4>
+                <p className="text-sm text-gray-500">Quantity: 1</p>
+              </div>
+              <div className="flex-shrink-0 ml-4">
+                <p className="text-base font-medium text-gray-800">$10.00</p>
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <h4 className="text-base font-medium text-gray-800">
+                  Product 2
+                </h4>
+                <p className="text-sm text-gray-500">Quantity: 2</p>
+              </div>
+              <div className="flex-shrink-0 ml-4">
+                <p className="text-base font-medium text-gray-800">$20.00</p>
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <h4 className="text-base font-medium text-gray-800">
+                  Product 3
+                </h4>
+                <p className="text-sm text-gray-500">Quantity: 1</p>
+              </div>
+              <div className="flex-shrink-0 ml-4">
+                <p className="text-base font-medium text-gray-800">$5.00</p>
+              </div>
+            </div>
+          </div>
+          <div className="mt-4 flex items-center justify-between">
+            <p className="text-base font-medium text-gray-800">Total:</p>
+            <p className="text-base font-medium text-gray-800">$35.00</p>
+          </div>
+          <div className="mt-4">
+            <Link
+              to="/cart"
+              className="block w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              View Cart
+            </Link>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
+
 export default Navbar;
